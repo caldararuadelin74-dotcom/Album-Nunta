@@ -3,15 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Album Nuntă - Fă o poză</title>
+<title>📸 Album Nuntă – Test</title>
 <style>
-  body { font-family: sans-serif; text-align:center; padding:20px; }
-  video, canvas { width: 90%; max-width: 400px; border-radius:10px; }
-  button { margin-top:10px; padding:10px 16px; font-size:16px; border-radius:8px; }
+  body { font-family: sans-serif; text-align:center; padding:20px; background:#faf8f5; }
+  h2 { color:#a86b38; }
+  video, canvas { width: 90%; max-width: 400px; border-radius:10px; margin-top:10px; }
+  button { margin-top:10px; padding:10px 16px; font-size:16px; border-radius:8px; background:#a86b38; color:white; border:none; cursor:pointer; }
+  button:hover { background:#915e32; }
+  p { font-size:14px; color:#555; }
 </style>
 </head>
 <body>
-<h2>📸 Fă o poză pentru albumul mirilor</h2>
+<h2>📸 Fă o poză pentru album</h2>
 <video id="video" autoplay playsinline></video>
 <canvas id="canvas" style="display:none"></canvas><br>
 <button id="snap">Fă poză</button>
@@ -19,7 +22,7 @@
 <p id="status">Permite accesul la cameră.</p>
 
 <script>
-const UPLOAD_URL = "https://script.google.com/macros/s/AKfycbzeFxbvk0s8MpBvMjgAjXCXZrQXGrRvnUw3cGzZcQNfZvfiXTbJJXo2D8ZUpTbrPNvR3g/exec"; // <- înlocuiește
+const UPLOAD_URL = "https://script.google.com/macros/s/AKfycbzeFxbvk0s8MpBvMjgAjXCXZrQXGrRvnUw3cGzZcQNfZvfiXTbJJXo2D8ZUpTbrPNvR3g/exec";
 
 const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
@@ -58,7 +61,7 @@ retakeBtn.onclick = () => {
 
 function uploadPhoto(){
   const dataURL = canvas.toDataURL('image/jpeg', 0.9);
-  const base64Data = dataURL.split(',')[1]; // scoatem prefixul data:image/jpeg;base64,
+  const base64Data = dataURL.split(',')[1];
   const filename = `guest_${Date.now()}.jpg`;
 
   statusP.textContent = "Se încarcă poza...";
@@ -70,13 +73,13 @@ function uploadPhoto(){
   .then(r => r.json())
   .then(res => {
     if (res.success) {
-      statusP.textContent = "Mulțumim! Poza a fost încărcată ✅";
+      statusP.textContent = "✅ Mulțumim! Poza a fost încărcată.";
     } else {
-      statusP.textContent = "Eroare: " + res.message;
+      statusP.textContent = "❌ Eroare: " + res.message;
     }
   })
   .catch(err => {
-    statusP.textContent = "Eroare la încărcare: " + err;
+    statusP.textContent = "❌ Eroare la încărcare: " + err;
   });
 }
 
