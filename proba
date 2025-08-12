@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>📸 Album Nuntă – Test</title>
+<style>
+  body { font-family: sans-serif; text-align:center; padding:20px; background:#faf8f5; }
+  h2 { color:#a86b38; }
+  video, canvas { width: 90%; max-width: 400px; border-radius:10px; margin-top:10px; }
+  button { margin-top:10px; padding:10px 16px; font-size:16px; border-radius:8px; background:#a86b38; color:white; border:none; cursor:pointer; }
+  button:hover { background:#915e32; }
+  p { font-size:14px; color:#555; }
+</style>
+</head>
+<body>
+<h2>📸 Fă o poză pentru album</h2>
+<video id="video" autoplay playsinline></video>
+<canvas id="canvas" style="display:none"></canvas><br>
+<button id="snap">Fă poză</button>
+<button id="retake" style="display:none">Refă poza</button>
+<p id="status">Permite accesul la cameră.</p>
+
+<script>
+const UPLOAD_URL = "https://script.google.com/macros/s/AKfycbzeFxbvk0s8MpBvMjgAjXCXZrQXGrRvnUw3cGzZcQNfZvfiXTbJJXo2D8ZUpTbrPNvR3g/exec";
+
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const snapBtn = document.getElementById('snap');
+const retakeBtn = document.getElementById('retake');
+const statusP = document.getElementById('status');
+
+async function startCamera(){
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+    video.srcObject = stream;
+  } catch(e) {
+    statusP.textContent = "Nu pot accesa camera: " + e;
+  }
+}
+
+snapBtn.onclick = () => {
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0);
+  video.style.display = "none";
+  canvas.style.display = "block";
+  snapBtn.style.display = "none";
+  retakeBtn.style.display = "inline-block";
+  uploadPhoto();
+};
+
+retakeBtn.onclick = () => {
+  video.style.display = "block";
+  canvas.style.display = "none";
+  snapBtn.style.display = "inline-block";
+  retakeBtn.style.display = "none";
+  statusP.textContent = "Permite accesul la cameră.";
+};
+
+function uploadPhoto(){
+  const dataURL = canvas.toDataURL('image/jpeg', 0.9);
+  const base64Data = dataURL.split(',')[1];
+  const filename = `guest_${Date.now()}.jpg`;
+
+  statusP.textContent = "Se încarcă poza...";
+  fetch(UPLOAD_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `filename=${encodeURIComponent(filename)}&data=${encodeURIComponent(base64Data)}`
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (res.success) {
+      statusP.textContent = "✅ Mulțumim! Poza a fost încărcată.";
+    } else {
+      statusP.textContent = "❌ Eroare: " + res.message;
+    }
+  })
+  .catch(err => {
+    statusP.textContent = "❌ Eroare la încărcare: " + err;
+  });
+}
+
+startCamera();
+</script>
+</body>
+</html>
